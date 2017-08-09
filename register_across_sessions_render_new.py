@@ -21,6 +21,7 @@ from renderapi.tilespec import MipMapLevel
 from renderapi.tilespec import ImagePyramid
 import json
 
+#adding comments
 
 def get_map_images(df,ribbon,session,section,channel,zstack):
         map_images = df[(df['ribbon']==ribbon) & (df['session']==session) & (df['section']==section) & (df['ch']==channel) & (df['zstack']==zstack) ]
@@ -49,27 +50,27 @@ def parse_from_row(row):
 class register(luigi.Task):
 	ribbon = luigi.IntParameter()
 	session = luigi.IntParameter()
-	section = luigi.IntParameter()	
+	section = luigi.IntParameter()
 	refsession = luigi.IntParameter()
 	parameters = luigi.Parameter()
 	df = luigi.Parameter()
 
 	cmd = ""
-	
+
 	def output(self):
-		
+
 
 		#get row from df to parse
 		channel = 0 #DAPI
 		row = getrow(self.df,self.ribbon,self.session,self.section,channel,0)
 		self.info = parse_from_row(row); info = self.info
-		
+
 		#adjust tile id for session num
 		str_tileid = '%s'%info['tileId']
 		pre_tileid = int(str_tileid[0]) - self.session
 		new_tileid = str(pre_tileid) + str_tileid[1:]
 		print new_tileid
-		
+
 		self.parameters['tileId'] = new_tileid
 		self.parameters['render']['project'] = '%s'%info['project']
 
@@ -80,8 +81,8 @@ class register(luigi.Task):
 			os.mkdir ("%s/processed/registration_tilespec/"%info['rootdir'])
 		if not os.path.exists("%s/processed/registration_transformspec/"%info['rootdir']):
 			os.mkdir ("%s/processed/registration_transformspec/"%info['rootdir'])
-		
-		outputtilespec = "%s/processed/registration_tilespec/DAPI_%01d_rib%04dsess%04dsect%04d.json"%(info['rootdir'],self.session,self.ribbon, self.session, self.section)				
+
+		outputtilespec = "%s/processed/registration_tilespec/DAPI_%01d_rib%04dsess%04dsect%04d.json"%(info['rootdir'],self.session,self.ribbon, self.session, self.section)
 		outputtransform = "%s/processed/registration_transformspec/rib%04dsess%04dsect%04d.json"%(info['rootdir'],self.ribbon, self.refsession, self.section)
 
 		print "output tilespec and transform"
@@ -110,9 +111,9 @@ class register(luigi.Task):
 		if not os.path.exists("%s/processed/stitched_tilespec_ff_dropped/"%self.info['rootdir']):
 			os.mkdir ("%s/processed/stitched_tilespec_ff_dropped/"%self.info['rootdir'])
 
-		inputtilespec = "%s/processed/stitched_tilespec_ff_dropped/DAPI_%01d_rib%04dsess%04dsect%04d.json"%(self.info['rootdir'],self.session,self.ribbon, self.session, self.section)	
+		inputtilespec = "%s/processed/stitched_tilespec_ff_dropped/DAPI_%01d_rib%04dsess%04dsect%04d.json"%(self.info['rootdir'],self.session,self.ribbon, self.session, self.section)
 		referencetilespec = "%s/processed/stitched_tilespec_ff_dropped/DAPI_%01d_rib%04dsess%04dsect%04d.json"%(self.info['rootdir'],self.refsession,self.ribbon, self.refsession, self.section)
-		
+
 		#mod = RenderModule(schema_type=RenderTileParameters,input_data=self.parameters,args=[])
 		#mod.run()
 		#mod.render.run(renderapi.utils.renderdump,inputts, inputtilespec)
@@ -121,10 +122,10 @@ class register(luigi.Task):
 		referencefile = open(referencetilespec,"w")
 		renderapi.utils.renderdump(inputts,inputfile)
 		renderapi.utils.renderdump(referencets,referencefile)
-		
 
 
-		inputtransformspec = "%s/processed/stitched_transformspec_ff/rib%04dsess%04dsect%04d.json"%(self.info['rootdir'],self.ribbon, self.session, self.section)	
+
+		inputtransformspec = "%s/processed/stitched_transformspec_ff/rib%04dsess%04dsect%04d.json"%(self.info['rootdir'],self.ribbon, self.session, self.section)
 		referencetransformspec = "%s/processed/stitched_transformspec_ff/rib%04dsess%04dsect%04d.json"%(self.info['rootdir'],self.ribbon, self.refsession, self.section)
 		outputtilespec = "%s/processed/registration_tilespec/DAPI_%01d_rib%04dsess%04dsect%04d.json"%(self.info['rootdir'],self.session,self.ribbon, self.session, self.section)
 		outputtransform = "%s/processed/registration_transformspec/rib%04dsess%04dsect%04d.json"%(self.info['rootdir'],self.ribbon, self.session, self.section)
@@ -134,7 +135,7 @@ class register(luigi.Task):
 		#self.cmd = "java -cp /pipeline/stitching/render-app-0.3.0-SNAPSHOT-jar-with-dependencies.jar:/pipeline/stitching/Fiji_Plugins-2.0.1.jar org.janelia.alignment.RegisterSections --modelType 1 --percentSaturated 0.9f --maxEpsilon 2.5 --initialSigma 2.5 --inputtilespec "
 		#self.cmd = "java -cp /data/array_tomography/ForSharmi/sharmirender/render/render-app/target/render-app-0.3.0-SNAPSHOT-jar-with-dependencies.jar:/pipeline/stitching/Fiji_Plugins-2.0.1.jar org.janelia.alignment.RegisterSections --modelType 1 --percentSaturated 0.9f --maxEpsilon 20.0f--initialSigma 1.6f  --maxOctaveSize 2048 --minOctaveSize 200 --inputtilespec "
 		self.cmd = "java -cp /pipeline/sharmi/sharmirender/render/render-app/target/render-app-0.3.0-SNAPSHOT-jar-with-dependencies.jar:/pipeline/stitching/Fiji_Plugins-2.0.1.jar org.janelia.alignment.RegisterSections --modelType 1 --percentSaturated 0.9f --maxEpsilon 2.5 --initialSigma 2.5 --inputtilespec "
-		self.cmd = self.cmd + inputtilespec + " --inputtransformspec " + inputtransformspec + " --referencetilespec " + referencetilespec + " --referencetransformspec " + referencetransformspec +  " --outputJson " + outputtransform + " --outputtilespec " + outputtilespec + " --referenceID " + refID 
+		self.cmd = self.cmd + inputtilespec + " --inputtransformspec " + inputtransformspec + " --referencetilespec " + referencetilespec + " --referencetransformspec " + referencetransformspec +  " --outputJson " + outputtransform + " --outputtilespec " + outputtilespec + " --referenceID " + refID
 		self.outputtilespec = outputtilespec
 		self.outputtransform = outputtransform
 		self.referencetransformspec = referencetransformspec
@@ -144,27 +145,27 @@ class register(luigi.Task):
 		print self.cmd
 		os.system(self.cmd)
 		print "THIS IS OUTPUTTILESPEC!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-		
+
 		print self.parameters['input_stack']
 		#upload to render
 		self.parameters['input_stack'] = 'Registered_DAPI%01d'%self.session
-		
+
 		#self.outputtilespec = "/nas2//data/HumanIHCopt_rnd1_control//processed/registration_tilespec/DAPI_3_rib0029sess0003sect0005.json"
 		#self.referencetransformspec = "/nas2//data/HumanIHCopt_rnd1_control//processed/stitched_transformspec_ff/rib0029sess0001sect0005.json"
 
-								
+
 
 		print self.outputtilespec
 		print self.referencetransformspec
 
 		print "STARTING UPLOADDDDDDDDDDDDD"
-		
+
 		mod = RenderModule(schema_type=RenderTileParameters,input_data=self.parameters,args=[])
 		mod.run()
 		mod.render.run(renderapi.stack.create_stack,mod.args['input_stack'],cycleNumber=4, cycleStepNumber=1)
 		mod.render.run(renderapi.client.import_jsonfiles_parallel,self.parameters['input_stack'], [self.outputtilespec],1,self.referencetransformspec)
-        
-        
+
+
         	print "UPLOADEDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
         	#mod.render.run(renderapi.stack.create_stack,mod.args['input_stack'],cycleNumber=4, cycleStepNumber=1)
         	#mod.render.run(renderapi.client.import_jsonfiles, mod.args['input_stack'], [self.outputtilespec])
@@ -195,15 +196,13 @@ class registersessions(luigi.Task):
 		R = []
 		C = []
 		S = []
-		for (rib,sess,sect) in uniq_sections:	
+		for (rib,sess,sect) in uniq_sections:
 			#if (sess == 2) & (rib == 1) & (sect == 0):
 			#if (sess > self.refsession) | (sess < self.refsession):
 			if (sess>0):
 				R.append(rib)
 				C.append(sect)
 				S.append(sess)
-		return[register(ribbon = R[i], section = C[i], session = S[i], refsession = self.refsession, parameters=self.parameters, df = self.df) for i in range (0, len(R))]		
+		return[register(ribbon = R[i], section = C[i], session = S[i], refsession = self.refsession, parameters=self.parameters, df = self.df) for i in range (0, len(R))]
 	def run(self):
 		print "running registration on all sections"
-
-
