@@ -1,27 +1,16 @@
-import luigi
-import pandas as pd
-from checkfileexists import checkfileexists
-import os
-import sys
+import luigi import pandas as pd from checkfileexists import checkfileexists
+import os import sys
 sys.path.insert(0,'/data/array_tomography/ForSharmi/allen_SB_code/celery/')
-sys.path.insert(0,os.getcwd())
-from RenderTarget import RenderTarget
-import renderapi
-from renderapi.transform import AffineModel
-from renderapps.module.render_module import RenderModule,RenderParameters
-from pathos.multiprocessing import Pool
-from functools import partial
-import tempfile
-import marshmallow as mm
-import numpy as np
-from RenderTileParameters import RenderTileParameters
-from RenderTileTarget import RenderTileTarget
-import glob
-from renderapi.tilespec import MipMapLevel
-from renderapi.tilespec import ImagePyramid
-import json
+sys.path.insert(0,os.getcwd()) from RenderTarget import RenderTarget import
+renderapi from renderapi.transform import AffineModel from
+renderapps.module.render_module import RenderModule,RenderParameters from
+pathos.multiprocessing import Pool from functools import partial import tempfile
+import marshmallow as mm import numpy as np from RenderTileParameters import
+RenderTileParameters from RenderTileTarget import RenderTileTarget import glob
+from renderapi.tilespec import MipMapLevel from renderapi.tilespec import
+ImagePyramid import json
 
-#adding comments
+#removing comments
 
 def get_map_images(df,ribbon,session,section,channel,zstack):
         map_images = df[(df['ribbon']==ribbon) & (df['session']==session) & (df['section']==section) & (df['ch']==channel) & (df['zstack']==zstack) ]
