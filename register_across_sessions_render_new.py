@@ -23,17 +23,12 @@ def getrow(df,ribbon,session,section,channel,zstack):
         row=map_images.iloc[0]
         return row
 
-def parse_from_row(row):
-        res = {}
-        res['fullfname']=row.loc['full_path']
-        [dirs,sep,res['fname']]=res['fullfname'].rpartition('/');
-        [res['channame'],sep1,right]=res['fname'].partition('_S');
-        [res['rootdir'],sep,therest]=res['fullfname'].rpartition('raw');
-        res['tileId']=row.loc['tileID']
-        fullstring = res['fullfname'].replace('//','/')
-        tok=fullstring.split("/")
-        res['project'] =tok[3]
-        return res
+def parse_from_row(row): res = {} res['fullfname']=row.loc['full_path']
+[dirs,sep,res['fname']]=res['fullfname'].rpartition('/');
+[res['channame'],sep1,right]=res['fname'].partition('_S');
+[res['rootdir'],sep,therest]=res['fullfname'].rpartition('raw');
+res['tileId']=row.loc['tileID'] fullstring = res['fullfname'].replace('//','/')
+tok=fullstring.split("/") res['project'] =tok[3] return res
 
 
 class register(luigi.Task):
@@ -66,13 +61,17 @@ class register(luigi.Task):
 
 
 		#create outputdirectories if they do not exist
-		if not os.path.exists("%s/processed/registration_tilespec/"%info['rootdir']):
-			os.mkdir ("%s/processed/registration_tilespec/"%info['rootdir'])
-		if not os.path.exists("%s/processed/registration_transformspec/"%info['rootdir']):
-			os.mkdir ("%s/processed/registration_transformspec/"%info['rootdir'])
+		if not
+		os.path.exists("%s/processed/registration_tilespec/"%info['rootdir']):
+		os.mkdir ("%s/processed/registration_tilespec/"%info['rootdir']) if not
+		os.path.exists("%s/processed/registration_transformspec/"%info['rootdir']):
+		os.mkdir ("%s/processed/registration_transformspec/"%info['rootdir'])
 
-		outputtilespec = "%s/processed/registration_tilespec/DAPI_%01d_rib%04dsess%04dsect%04d.json"%(info['rootdir'],self.session,self.ribbon, self.session, self.section)
-		outputtransform = "%s/processed/registration_transformspec/rib%04dsess%04dsect%04d.json"%(info['rootdir'],self.ribbon, self.refsession, self.section)
+		outputtilespec =
+		"%s/processed/registration_tilespec/DAPI_%01d_rib%04dsess%04dsect%04d.json"%(info['rootdir'],self.session,self.ribbon,
+		self.session, self.section) outputtransform =
+		"%s/processed/registration_transformspec/rib%04dsess%04dsect%04d.json"%(info['rootdir'],self.ribbon,
+		self.refsession, self.section)
 
 		print "output tilespec and transform"
 		print outputtilespec
@@ -87,7 +86,7 @@ class register(luigi.Task):
 		return RenderTarget(self.parameters)
 	def requires(self):
 
-
+        
 		zval = self.ribbon*100+self.section
 
 		mod = RenderModule(schema_type=RenderTileParameters,input_data=self.parameters,args=[])
