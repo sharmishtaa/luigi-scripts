@@ -1,14 +1,25 @@
-import luigi import pandas as pd from checkfileexists import checkfileexists
-import os import sys
+import luigi
+import pandas as pd
+from checkfileexists import checkfileexists
+import os
+import sys
 sys.path.insert(0,'/data/array_tomography/ForSharmi/allen_SB_code/celery/')
-sys.path.insert(0,os.getcwd()) from RenderTarget import RenderTarget import
-renderapi from renderapi.transform import AffineModel from
-renderapps.module.render_module import RenderModule,RenderParameters from
-pathos.multiprocessing import Pool from functools import partial import tempfile
-import marshmallow as mm import numpy as np from RenderTileParameters import
-RenderTileParameters from RenderTileTarget import RenderTileTarget import glob
-from renderapi.tilespec import MipMapLevel from renderapi.tilespec import
-ImagePyramid import json
+sys.path.insert(0,os.getcwd())
+from RenderTarget import RenderTarget
+import renderapi
+from renderapi.transform  import AffineModel
+from renderapps.module.render_module import RenderModule,RenderParameters
+from pathos.multiprocessing import Pool
+from functools import partial
+import tempfile
+import marshmallow as mm
+import numpy as np
+from RenderTileParameters import RenderTileParameters
+from RenderTileTarget import RenderTileTarget
+import glob
+from renderapi.tilespec import MipMapLevel
+from renderapi.tilespec import ImagePyramid
+import json
 
 #removing comments
 
@@ -23,12 +34,17 @@ def getrow(df,ribbon,session,section,channel,zstack):
         row=map_images.iloc[0]
         return row
 
-def parse_from_row(row): res = {} res['fullfname']=row.loc['full_path']
-[dirs,sep,res['fname']]=res['fullfname'].rpartition('/');
-[res['channame'],sep1,right]=res['fname'].partition('_S');
-[res['rootdir'],sep,therest]=res['fullfname'].rpartition('raw');
-res['tileId']=row.loc['tileID'] fullstring = res['fullfname'].replace('//','/')
-tok=fullstring.split("/") res['project'] =tok[3] return res
+def parse_from_row(row):
+    res = {}
+    res['fullfname']=row.loc['full_path']
+    [dirs,sep,res['fname']]=res['fullfname'].rpartition('/');
+    [res['channame'],sep1,right]=res['fname'].partition('_S');
+    [res['rootdir'],sep,therest]=res['fullfname'].rpartition('raw');
+    res['tileId']=row.loc['tileID']
+    fullstring = res['fullfname'].replace('//','/')
+    tok=fullstring.split("/")
+    res['project'] =tok[3]
+    return res
 
 
 class register(luigi.Task):
@@ -58,35 +74,27 @@ class register(luigi.Task):
 		self.parameters['tileId'] = new_tileid
 		self.parameters['render']['project'] = '%s'%info['project']
 
-
-
-		#create outputdirectories if they do not exist
-		if not
-		os.path.exists("%s/processed/registration_tilespec/"%info['rootdir']):
-		os.mkdir ("%s/processed/registration_tilespec/"%info['rootdir']) if not
-		os.path.exists("%s/processed/registration_transformspec/"%info['rootdir']):
-		os.mkdir ("%s/processed/registration_transformspec/"%info['rootdir'])
-
-		outputtilespec =
-		"%s/processed/registration_tilespec/DAPI_%01d_rib%04dsess%04dsect%04d.json"%(info['rootdir'],self.session,self.ribbon,
-		self.session, self.section) outputtransform =
-		"%s/processed/registration_transformspec/rib%04dsess%04dsect%04d.json"%(info['rootdir'],self.ribbon,
-		self.refsession, self.section)
-
-		print "output tilespec and transform"
-		print outputtilespec
-		print outputtransform
-		self.parameters['input_stack'] = 'Registered_DAPI%01d'%self.session
+        	if not os.path.exists("%s/processed/registration_tilespec/"%info['rootdir']):
+            		os.mkdir ("%s/processed/registration_tilespec/"%info['rootdir'])
+        	if not os.path.exists("%s/processed/registration_transformspec/"%info['rootdir']):
+            		os.mkdir ("%s/processed/registration_transformspec/"%info['rootdir'])
+        	outputtilespec ="%s/processed/registration_tilespec/DAPI_%01d_rib%04dsess%04dsect%04d.json"%(info['rootdir'],self.session,self.ribbon,self.session, self.section)
+        	outputtransform = "%s/processed/registration_transformspec/rib%04dsess%04dsect%04d.json"%(info['rootdir'],self.ribbon,self.refsession, self.section)
+        	print "output tilespec and transform"
+        	print outputtilespec
+        	print outputtransform
+        	self.parameters['input_stack'] = 'Registered_DAPI%01d'%self.session
+        	return RenderTarget(self.parameters)
                 #mod = RenderModule(schema_type=RenderTileParameters,input_data=self.parameters,args=[])
                 #mod.run()
                 #mod.render.run(renderapi.stack.create_stack,mod.args['input_stack'],cycleNumber=4, cycleStepNumber=1)
                 #mod.render.run(renderapi.client.import_jsonfiles_parallel,self.parameters['input_stack'], [outputtilespec], 1, outputtransform)
 
 		#return luigi.LocalTarget(outputtilespec)
-		return RenderTarget(self.parameters)
+
 	def requires(self):
 
-        
+        #requiremen
 		zval = self.ribbon*100+self.section
 
 		mod = RenderModule(schema_type=RenderTileParameters,input_data=self.parameters,args=[])
